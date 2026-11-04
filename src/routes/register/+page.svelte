@@ -1,78 +1,80 @@
 <script lang="ts">
-
     // variable
     // condition
     // loop
     // function
 
-    let enteredPassword: string = $state("")
+    let enteredUsername = $state("");
+    let enteredPassword = $state("");
+    let enteredConfirmPassword = $state("");
 
-    interface Human {
-        name: string
-        username: string
-        password: string
-    }
+    let feedback = $state("");
 
+    let isRegisted = $state(false);
 
-    function registerUser(){
-        if (enteredUsername == "John"){
-            alert("Correct guy")
+    function registerUser() {
+        if (enteredPassword != enteredConfirmPassword) {
+            feedback = "password did not match";
+        } else {
+            feedback = "";
+            isRegisted = true;
         }
-        else {
-            alert("Not John. Entered username: " + enteredUsername);
-        }
-
     }
-   
 
     // == -> "is"
     // != -> "is not"
     // && -> "and"
-
-    let isPassword = $state(true)
-
-    function togglePassword(){
-        if (isPassword){
-            isPassword =false;
-        }
-        else{
-            isPassword = true
-        }
-    }
-
-
-    let enteredUsername: string = $state("")
-    
-    function callShoutFocus(){
-        enteredUsername = "Bla bla bla"
-    }
-    function deleteUsername(){
-        enteredUsername = ""
-    }
-
-
 </script>
 
+<div class="w-full h-screen flex flex-col align-middle place-items-center">
+    {#if feedback !== ""}
+        <div class="bg-red-300 text-white p-3 text-sm">{feedback}</div>
+    {/if}
 
-<input type="text" onfocus={callShoutFocus} onblur={deleteUsername} class="bg-yellow-600" placeholder="Username" bind:value={enteredUsername}/>
-<!-- <input type={isPassword ? "password" : "text"} class="bg-gray-600" placeholder="Password" bind:value={enteredPassword}/> -->
+    {#if isRegisted}
+        <h1 class="text-6xl">Welcome new user</h1>
+    {:else}
+        <div class="max-w-sm w-full flex flex-col gap-4">
+            <div class="">
+                Username: {enteredUsername}
+            </div>
+            <div class="">
+                Password: {enteredPassword}
+            </div>
+            <div class="">
+                Confirm Pass: {enteredConfirmPassword}
+            </div>
+            <div class="flex flex-col">
+                Username
+                <input
+                    class="bg-gray-200"
+                    type="text"
+                    bind:value={enteredUsername}
+                />
+            </div>
+            <div class="flex flex-col">
+                Password
+                <input
+                    class="bg-gray-200"
+                    type="text"
+                    bind:value={enteredPassword}
+                />
+            </div>
+            <div class="flex flex-col">
+                Confirm Password
+                <input
+                    class="bg-gray-200"
+                    type="text"
+                    bind:value={enteredConfirmPassword}
+                />
+            </div>
 
-
-<button class="bg-amber-950 p-4" onclick={togglePassword}>()</button>
-
-<!-- 
-
-onmouseenter 
-
-on mouse enter
-when mouse enter -->
-
-
-
-<button onclick={registerUser} class="bg-red-600 text-white p-2 rounded-md">Register</button>
-<!-- 
-when clicked call registerUser function
--->
-
-
-<!-- switch => join wire => current enter bulb => bulb light -->
+            <button
+                onclick={registerUser}
+                class="bg-blue-400 text-white p-4 rounded-md"
+            >
+                Register
+            </button>
+        </div>
+    {/if}
+</div>

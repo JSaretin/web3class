@@ -56,31 +56,21 @@
     // == -> "is"
     // != -> "is not"
     // && -> "and"
+    let buttonIsActive = $state(false)
+    function activeButton(){
+        // buttonIsActive = !buttonIsActive
+        if (buttonIsActive){
+            buttonIsActive = false
+        }
+        else {
+            buttonIsActive = true
+        }
+    }
+
+
 </script>
 
-<div
-    class="w-full h-screen flex justify-center align-middle place-items-center"
->
-    <div class="max-w-md w-full">
-        {feedback}
-        {#if isLoggedIn}
-            <h1>Welcome to dashboard</h1>
-        {:else}
-            <div class="flex flex-col gap-4">
-                <input
-                    class="bg-gray-200"
-                    type="text"
-                    placeholder="username"
-                    bind:value={enteredUsername}
-                />
-                <input
-                    class="bg-gray-200"
-                    placeholder="password"
-                    type="text"
-                    bind:value={enteredPassword}
-                />
-                <button class="bg-gray-600" onclick={login}>Login</button>
-            </div>
-        {/if}
-    </div>
-</div>
+
+<button onclick={activeButton}>
+    <div class={"w-96 h-96 rounded-full " + (buttonIsActive ? "bg-green-500" : "bg-red-500")}></div>
+</button>
