@@ -1,80 +1,84 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
+    import { getContext } from "svelte";
+
     // variable
     // condition
     // loop
     // function
+    interface User {
+        id: number;
+        name: string;
+        username: string;
+        password: string;
+        followsId: string[];
+    }
 
+    const users: User[] = getContext("users");
+
+    let enteredName = $state("");
     let enteredUsername = $state("");
     let enteredPassword = $state("");
     let enteredConfirmPassword = $state("");
 
-    let feedback = $state("");
-
-    let isRegisted = $state(false);
-
-    function registerUser() {
+    function addNewUser() {
         if (enteredPassword != enteredConfirmPassword) {
-            feedback = "password did not match";
-        } else {
-            feedback = "";
-            isRegisted = true;
+            alert("Password is incorrect");
+            return;
         }
-    }
 
-    // == -> "is"
-    // != -> "is not"
-    // && -> "and"
+        let isRegistered = false;
+        for (const user of users) {
+            // for user in users
+            if (enteredUsername == user.username) {
+                isRegistered = true;
+            }
+        }
+
+        if (isRegistered) {
+            alert("You are already registered. Login instead");
+            return;
+        }
+
+        users.push({
+            id: users.length + 1,
+            name: enteredName,
+            username: enteredUsername,
+            password: enteredPassword,
+            followsId: [],
+        });
+
+        enteredName = "";
+        enteredPassword = "";
+        enteredConfirmPassword = "";
+        enteredUsername = "";
+
+        goto("/");
+    }
 </script>
 
-<div class="w-full h-screen flex flex-col align-middle place-items-center">
-    {#if feedback !== ""}
-        <div class="bg-red-300 text-white p-3 text-sm">{feedback}</div>
-    {/if}
+<div class="flex flex-col gap-4">
+    <div class="flex flex-col">
+        Name
+        <input class="bg-gray-200" type="text" bind:value={enteredName} />
+    </div>
+    <div class="flex flex-col">
+        Username
+        <input class="bg-gray-200" type="text" bind:value={enteredUsername} />
+    </div>
 
-    {#if isRegisted}
-        <h1 class="text-6xl">Welcome new user</h1>
-    {:else}
-        <div class="max-w-sm w-full flex flex-col gap-4">
-            <div class="">
-                Username: {enteredUsername}
-            </div>
-            <div class="">
-                Password: {enteredPassword}
-            </div>
-            <div class="">
-                Confirm Pass: {enteredConfirmPassword}
-            </div>
-            <div class="flex flex-col">
-                Username
-                <input
-                    class="bg-gray-200"
-                    type="text"
-                    bind:value={enteredUsername}
-                />
-            </div>
-            <div class="flex flex-col">
-                Password
-                <input
-                    class="bg-gray-200"
-                    type="text"
-                    bind:value={enteredPassword}
-                />
-            </div>
-            <div class="flex flex-col">
-                Confirm Password
-                <input
-                    class="bg-gray-200"
-                    type="text"
-                    bind:value={enteredConfirmPassword}
-                />
-            </div>
+    <div class="flex flex-col">
+        Password
+        <input class="bg-gray-200" type="text" bind:value={enteredPassword} />
+    </div>
+    <div class="flex flex-col">
+        Confirm Password
+        <input
+            class="bg-gray-200"
+            type="text"
+            bind:value={enteredConfirmPassword}
+        />
+    </div>
 
-            <button
-                onclick={registerUser}
-                class="bg-blue-400 text-white p-4 rounded-md"
-            >
-                Register
-            </button>
-        </div>
-    {/if}
+    <button onclick={addNewUser} class="bg-blue-500">Register</button>
 </div>
