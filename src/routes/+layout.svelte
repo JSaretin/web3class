@@ -3,7 +3,7 @@
 	import favicon from "#lib/assets/favicon.svg";
 	import type { LayoutProps } from "./$types";
 	import { setContext } from "svelte";
-    import { goto } from "$app/navigation";
+	import { goto } from "$app/navigation";
 
 	let { children }: LayoutProps = $props();
 
@@ -33,11 +33,28 @@
 	]);
 
 	setContext("users", users);
-
 	let isLogin = $state(false);
 
-	function directUserToTheRegisterPage(){
-		goto('/register')
+	function setLogin(state: boolean) {
+		isLogin = state;
+	}
+
+	setContext("setLogin", setLogin);
+
+	function directUserToTheRegisterPage() {
+		goto("/register");
+	}
+
+	function directUserToTheLoginPage() {
+		goto("/login");
+	}
+
+	function callLogin() {
+		setLogin(true);
+	}
+
+	function callLogout() {
+		setLogin(false);
 	}
 </script>
 
@@ -57,11 +74,13 @@
 
 	<div class="flex gap-4">
 		{#if isLogin}
-			<button>Profile</button>
-			<button>Logout</button>
+			<button class="p-2 rounded-md bg-blue-500">Profile</button>
+			<button class="p-2 rounded-md bg-red-500" onclick={callLogout}>Logout</button>
 		{:else}
-			<button>Login</button>
-			<button onclick={directUserToTheRegisterPage}>Register</button>
+			<button class="p-2 rounded-md bg-blue-500" onclick={directUserToTheLoginPage}>Login</button>
+			<button class="p-2 rounded-md bg-green-500" onclick={directUserToTheRegisterPage}
+				>Register</button
+			>
 		{/if}
 	</div>
 	{@render children()}
