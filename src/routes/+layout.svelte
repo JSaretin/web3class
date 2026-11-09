@@ -3,7 +3,6 @@
 	import favicon from "#lib/assets/favicon.svg";
 	import type { LayoutProps } from "./$types";
 	import { setContext } from "svelte";
-	import { goto } from "$app/navigation";
 
 	let { children }: LayoutProps = $props();
 
@@ -20,41 +19,51 @@
 			id: 1,
 			name: "John Osaretin",
 			username: "Jsaretin",
-			password: "1234",
-			followsId: [],
-		},
-		{
-			id: 2,
-			name: "Mike Osaretin",
-			username: "Msaretin",
-			password: "3894",
+			password: "12345678",
 			followsId: [],
 		},
 	]);
 
-	setContext("users", users);
-	let isLogin = $state(false);
+	function addNewUser(name: string, username: string, password: string) {
+		for (const user of users) {
+			if (username == user.username) {
+				throw "username taken";
+			}
+		}
 
-	function setLogin(state: boolean) {
-		isLogin = state;
+		users.push({
+			id: users.length + 1,
+			name: name,
+			username: username,
+			password: password,
+			followsId: [],
+		});
 	}
 
-	setContext("setLogin", setLogin);
+	let loggedInUser: User | undefined = $state(undefined);
 
-	function directUserToTheRegisterPage() {
-		goto("/register");
+	function loginUser(username: string, password: string) {
+		// for each user may day users
+		// if we see a user with the exact username and password
+		// may the person pass to this function, we go login that
+		// user
+		for (const user of users) {
+			if (user.username == username && user.password == password) {
+				loggedInUser = user;
+			}
+		}
+
+		if (loggedInUser == undefined) {
+			// alert();
+			throw "invalid username or password";
+		}
 	}
 
-	function directUserToTheLoginPage() {
-		goto("/login");
-	}
+	setContext("addNewUser", addNewUser);
+	setContext("loginUser", loginUser);
 
-	function callLogin() {
-		setLogin(true);
-	}
-
-	function callLogout() {
-		setLogin(false);
+	function logUserOut() {
+		loggedInUser = undefined;
 	}
 </script>
 
@@ -62,26 +71,23 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="max-w-md w-full mx-auto">
-	<div class="mb-20">
+<div class="w-full p-10 h-screen mx-auto bg-amber-200">
+	<div class="">
+		{#if loggedInUser == undefined}
+			<a href="/login" class="bg-blue-500">Login</a>
+			<a href="/register" class="bg-green-500">Register</a>
+		{:else}
+			<a href="/profile" class="bg-blue-500">Profile</a>
+			<button onclick={logUserOut} class="bg-red-500">Logout</button>
+		{/if}
+	</div>
+	<div class=" flex flex-col gap-4">
 		{#each users as user (user.id)}
-			<div class="">
-				Id: {user.id} username: {user.name}
-				<span>({user.followsId.length})</span>
+			<div class="bg-white">
+				<p>{user.name} ({user.followsId.length})</p>
+				<p>@{user.username}</p>
 			</div>
 		{/each}
-	</div>
-
-	<div class="flex gap-4">
-		{#if isLogin}
-			<button class="p-2 rounded-md bg-blue-500">Profile</button>
-			<button class="p-2 rounded-md bg-red-500" onclick={callLogout}>Logout</button>
-		{:else}
-			<button class="p-2 rounded-md bg-blue-500" onclick={directUserToTheLoginPage}>Login</button>
-			<button class="p-2 rounded-md bg-green-500" onclick={directUserToTheRegisterPage}
-				>Register</button
-			>
-		{/if}
 	</div>
 	{@render children()}
 </div>
