@@ -3,16 +3,10 @@
 	import favicon from "#lib/assets/favicon.svg";
 	import type { LayoutProps } from "./$types";
 	import { setContext } from "svelte";
+	import type { User } from "#lib/types.ts";
+	import { goto } from "$app/navigation";
 
 	let { children }: LayoutProps = $props();
-
-	interface User {
-		id: number;
-		name: string;
-		username: string;
-		password: string;
-		followsId: string[];
-	}
 
 	let users: User[] = $state([
 		{
@@ -23,6 +17,8 @@
 			followsId: [],
 		},
 	]);
+
+	setContext("users", users);
 
 	function addNewUser(name: string, username: string, password: string) {
 		for (const user of users) {
@@ -59,35 +55,97 @@
 		}
 	}
 
+	function getLoggedInUser() {
+		return loggedInUser;
+	}
+
+	setContext("getLoggedInUser", getLoggedInUser);
 	setContext("addNewUser", addNewUser);
 	setContext("loginUser", loginUser);
 
 	function logUserOut() {
 		loggedInUser = undefined;
 	}
+
+	function toggleFollowUser(userId: number) {
+		if (loggedInUser == undefined) {
+			goto("/login");
+			return;
+			// throw "You need to login before you can follow users";
+		}
+
+		let selectedUser: User | undefined = undefined;
+		let currentIndex: number = 0;
+
+		let userIndex: number = 0;
+
+		for (const user of users) {
+			if (user.id == userId) {
+				selectedUser = user;
+				userIndex = currentIndex;
+			}
+			currentIndex = currentIndex + 1;
+		}
+
+		if (selectedUser == undefined) {
+			throw "Not user found";
+		}
+
+		let isAlreadyFollowing = false;
+		for (const followerId of selectedUser.followsId) {
+			if (followerId == loggedInUser.id) {
+				isAlreadyFollowing = true;
+			}
+		}
+
+		if (isAlreadyFollowing) {
+			selectedUser.followsId = selectedUser.followsId.filter(
+				(id) => id != loggedInUser?.id,
+			);
+		} else {
+			selectedUser.followsId.push(loggedInUser.id);
+		}
+
+		users[userIndex] = selectedUser;
+	}
+
+	setContext("toggleFollowUser", toggleFollowUser);
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="w-full p-10 h-screen mx-auto bg-amber-200">
-	<div class="">
-		{#if loggedInUser == undefined}
-			<a href="/login" class="bg-blue-500">Login</a>
-			<a href="/register" class="bg-green-500">Register</a>
-		{:else}
-			<a href="/profile" class="bg-blue-500">Profile</a>
-			<button onclick={logUserOut} class="bg-red-500">Logout</button>
-		{/if}
-	</div>
-	<div class=" flex flex-col gap-4">
-		{#each users as user (user.id)}
-			<div class="bg-white">
-				<p>{user.name} ({user.followsId.length})</p>
-				<p>@{user.username}</p>
+<div class="w-full p-10 h-screen mx-auto bg-neutral-900">
+	<div class="max-w-md mx-auto relative">
+		<div class="flex justify-between p-4 bg-white border-b-2 mb-10">
+			<a href="/"
+				><h1 class="font-black text-2xl text-neutral-950">Chat</h1></a
+			>
+
+			<div class="">
+				{#if loggedInUser == undefined}
+					<a href="/login" class="bg-blue-500 p-2 rounded-md text-sm"
+						>Login</a
+					>
+					<a
+						href="/register"
+						class="bg-green-500 p-2 rounded-md text-sm">Register</a
+					>
+				{:else}
+					<a
+						href="/profile"
+						class="bg-blue-500 p-2 rounded-md text-sm"
+						>@{loggedInUser.username}</a
+					>
+					<button
+						onclick={logUserOut}
+						class="bg-red-500 p-2 rounded-md text-sm">Logout</button
+					>
+				{/if}
 			</div>
-		{/each}
+		</div>
+
+		{@render children()}
 	</div>
-	{@render children()}
 </div>
