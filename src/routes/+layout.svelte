@@ -16,6 +16,13 @@
 			password: "12345678",
 			followsId: [],
 		},
+		{
+			id: 2,
+			name: "Precious Aza",
+			username: "precious",
+			password: "12345678",
+			followsId: [],
+		},
 	]);
 
 	setContext("users", users);
@@ -36,6 +43,8 @@
 		});
 	}
 
+	setContext("addNewUser", addNewUser);
+
 	let loggedInUser: User | undefined = $state(undefined);
 
 	function loginUser(username: string, password: string) {
@@ -55,13 +64,13 @@
 		}
 	}
 
+	setContext("loginUser", loginUser);
+
 	function getLoggedInUser() {
 		return loggedInUser;
 	}
 
 	setContext("getLoggedInUser", getLoggedInUser);
-	setContext("addNewUser", addNewUser);
-	setContext("loginUser", loginUser);
 
 	function logUserOut() {
 		loggedInUser = undefined;
@@ -75,8 +84,8 @@
 		}
 
 		let selectedUser: User | undefined = undefined;
-		let currentIndex: number = 0;
 
+		let currentIndex: number = 0;
 		let userIndex: number = 0;
 
 		for (const user of users) {
@@ -118,7 +127,9 @@
 
 <div class="w-full p-10 h-screen mx-auto bg-neutral-900">
 	<div class="max-w-md mx-auto relative">
-		<div class="flex justify-between p-4 bg-white border-b-2 mb-10">
+		<div
+			class="flex justify-between p-4 rounded-md bg-white border-b-2 mb-10"
+		>
 			<a href="/"
 				><h1 class="font-black text-2xl text-neutral-950">Chat</h1></a
 			>
