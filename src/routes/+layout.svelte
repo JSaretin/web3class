@@ -8,155 +8,107 @@
 
 	let { children }: LayoutProps = $props();
 
-	let users: User[] = $state([
+	interface Member {
+		name: string;
+		isNewMember: boolean;
+		phoneNumber: string;
+	}
+
+	let churchMembers: Member[] = $state([
 		{
-			id: 1,
-			name: "John Osaretin",
-			username: "Jsaretin",
-			password: "12345678",
-			followsId: [],
-		},
-		{
-			id: 2,
-			name: "Precious Aza",
-			username: "precious",
-			password: "12345678",
-			followsId: [],
+			name: "Mr Ona",
+			isNewMember: false,
+			phoneNumber: "09145789036",
 		},
 	]);
 
-	setContext("users", users);
+	let enteredName = $state("");
 
-	function addNewUser(name: string, username: string, password: string) {
-		for (const user of users) {
-			if (username == user.username) {
-				throw "username taken";
+	let startWelcoming = $state(false);
+
+	function checkMemberStatus() {
+		let isNewMember = true;
+
+		for (const member of churchMembers) {
+			if (enteredName == member.name) {
+				isNewMember = false;
 			}
 		}
 
-		users.push({
-			id: users.length + 1,
-			name: name,
-			username: username,
-			password: password,
-			followsId: [],
-		});
-	}
-
-	setContext("addNewUser", addNewUser);
-
-	let loggedInUser: User | undefined = $state(undefined);
-
-	function loginUser(username: string, password: string) {
-		// for each user may day users
-		// if we see a user with the exact username and password
-		// may the person pass to this function, we go login that
-		// user
-		for (const user of users) {
-			if (user.username == username && user.password == password) {
-				loggedInUser = user;
-			}
-		}
-
-		if (loggedInUser == undefined) {
-			// alert();
-			throw "invalid username or password";
-		}
-	}
-
-	setContext("loginUser", loginUser);
-
-	function getLoggedInUser() {
-		return loggedInUser;
-	}
-
-	setContext("getLoggedInUser", getLoggedInUser);
-
-	function logUserOut() {
-		loggedInUser = undefined;
-	}
-
-	function toggleFollowUser(userId: number) {
-		if (loggedInUser == undefined) {
-			goto("/login");
-			return;
-			// throw "You need to login before you can follow users";
-		}
-
-		let selectedUser: User | undefined = undefined;
-
-		let currentIndex: number = 0;
-		let userIndex: number = 0;
-
-		for (const user of users) {
-			if (user.id == userId) {
-				selectedUser = user;
-				userIndex = currentIndex;
-			}
-			currentIndex = currentIndex + 1;
-		}
-
-		if (selectedUser == undefined) {
-			throw "Not user found";
-		}
-
-		let isAlreadyFollowing = false;
-		for (const followerId of selectedUser.followsId) {
-			if (followerId == loggedInUser.id) {
-				isAlreadyFollowing = true;
-			}
-		}
-
-		if (isAlreadyFollowing) {
-			selectedUser.followsId = selectedUser.followsId.filter(
-				(id) => id != loggedInUser?.id,
-			);
+		if (isNewMember) {
+			startWelcoming = true;
+			console.log("welcome new member");
 		} else {
-			selectedUser.followsId.push(loggedInUser.id);
+			console.log("Day go house");
 		}
-
-		users[userIndex] = selectedUser;
 	}
 
-	setContext("toggleFollowUser", toggleFollowUser);
+	let enteredPhoneNumber: string = $state("");
+	function registerNewMember() {
+		churchMembers.push({
+			name: enteredName,
+			phoneNumber: enteredPhoneNumber,
+			isNewMember: false,
+		});
+		startWelcoming = false;
+		enteredName = "";
+		enteredPhoneNumber = "";
+
+		// processAirtime()
+	}
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="w-full p-10 h-screen mx-auto bg-neutral-900">
-	<div class="max-w-md mx-auto relative">
-		<div
-			class="flex justify-between p-4 rounded-md bg-white border-b-2 mb-10"
-		>
-			<a href="/"
-				><h1 class="font-black text-2xl text-neutral-950">Chat</h1></a
+{#if startWelcoming}
+	<div
+		class="fixed indent-0
+	bg-gray-900 w-full h-screen flex align-middle place-items-center justify-items-center"
+	>
+		<div class="max-w-sm w-full mx-auto flex flex-col gap-4">
+			<p class="text-white">
+				Thank you for fellowshiping with us. Enter you phone number
+				below to get a #1000 airtime
+			</p>
+			<input
+				bind:value={enteredPhoneNumber}
+				class="bg-gray-200 p-4"
+				type="text"
+				placeholder="Phone Number"
+			/>
+			<button
+				class="bg-blue-400 p-2 text-xs text-white"
+				onclick={registerNewMember}>Become A Member</button
 			>
-
-			<div class="">
-				{#if loggedInUser == undefined}
-					<a href="/login" class="bg-blue-500 p-2 rounded-md text-sm"
-						>Login</a
-					>
-					<a
-						href="/register"
-						class="bg-green-500 p-2 rounded-md text-sm">Register</a
-					>
-				{:else}
-					<a
-						href="/profile"
-						class="bg-blue-500 p-2 rounded-md text-sm"
-						>@{loggedInUser.username}</a
-					>
-					<button
-						onclick={logUserOut}
-						class="bg-red-500 p-2 rounded-md text-sm">Logout</button
-					>
-				{/if}
-			</div>
 		</div>
+	</div>
+{/if}
 
-		{@render children()}
+<div
+	class="w-full h-screen flex align-middle place-items-center justify-items-center"
+>
+	<div class="max-w-sm w-full mx-auto flex flex-col gap-4">
+		<div class="">
+			{#each churchMembers as member, _}
+				<div class="">
+					<p>{member.name}</p>
+					<p>{member.phoneNumber}</p>
+				</div>
+			{/each}
+		</div>
+		<input
+			bind:value={enteredName}
+			class="bg-gray-200 p-4"
+			type="text"
+			placeholder="name"
+		/>
+		<button
+			class="bg-blue-400 p-2 text-xs text-white"
+			onclick={checkMemberStatus}>check status</button
+		>
 	</div>
 </div>
+
+{@render children()}
