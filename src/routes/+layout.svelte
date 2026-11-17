@@ -3,112 +3,58 @@
 	import favicon from "#lib/assets/favicon.svg";
 	import type { LayoutProps } from "./$types";
 	import { setContext } from "svelte";
-	import type { User } from "#lib/types.ts";
+	import type { Blog, User } from "#lib/types.ts";
 	import { goto } from "$app/navigation";
 
 	let { children }: LayoutProps = $props();
 
-	interface Member {
-		name: string;
-		isNewMember: boolean;
-		phoneNumber: string;
+	function getBLogsFromDatabase(): Blog[] {
+		return [
+			{
+				description: "This is the blog body",
+				author: {
+					name: "John Osaretin",
+				},
+				id: 1,
+			},
+		];
 	}
 
-	let churchMembers: Member[] = $state([
-		{
-			name: "Mr Ona",
-			isNewMember: false,
-			phoneNumber: "09145789036",
-		},
-	]);
+	let blogs: Blog[] = $state(getBLogsFromDatabase());
 
-	let enteredName = $state("");
+	setContext("getBlogs", () => blogs);
 
-	let startWelcoming = $state(false);
+	function createBlog(blog: Blog) {
+		blogs.push(blog);
+	}
 
-	function checkMemberStatus() {
-		let isNewMember = true;
+	function deleteBlog(blogId: number) {
+		let newBlogs: Blog[] = [];
 
-		for (const member of churchMembers) {
-			if (enteredName == member.name) {
-				isNewMember = false;
+		for (const blog of blogs) {
+			if (blog.id != blogId) {
+				newBlogs.push(blog);
 			}
 		}
 
-		if (isNewMember) {
-			startWelcoming = true;
-			console.log("welcome new member");
-		} else {
-			console.log("Day go house");
-		}
+		blogs = newBlogs;
 	}
 
-	let enteredPhoneNumber: string = $state("");
-	function registerNewMember() {
-		churchMembers.push({
-			name: enteredName,
-			phoneNumber: enteredPhoneNumber,
-			isNewMember: false,
-		});
-		startWelcoming = false;
-		enteredName = "";
-		enteredPhoneNumber = "";
-
-		// processAirtime()
+	function setFullListOfBlog(newBlogs: Blog[]) {
+		blogs = newBlogs;
 	}
+
+	setContext("createBlog", createBlog);
+	setContext("deleteBlog", deleteBlog);
+	setContext("setFullListOfBlog", setFullListOfBlog);
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if startWelcoming}
-	<div
-		class="fixed indent-0
-	bg-gray-900 w-full h-screen flex align-middle place-items-center justify-items-center"
-	>
-		<div class="max-w-sm w-full mx-auto flex flex-col gap-4">
-			<p class="text-white">
-				Thank you for fellowshiping with us. Enter you phone number
-				below to get a #1000 airtime
-			</p>
-			<input
-				bind:value={enteredPhoneNumber}
-				class="bg-gray-200 p-4"
-				type="text"
-				placeholder="Phone Number"
-			/>
-			<button
-				class="bg-blue-400 p-2 text-xs text-white"
-				onclick={registerNewMember}>Become A Member</button
-			>
-		</div>
-	</div>
-{/if}
-
-<div
-	class="w-full h-screen flex align-middle place-items-center justify-items-center"
->
-	<div class="max-w-sm w-full mx-auto flex flex-col gap-4">
-		<div class="">
-			{#each churchMembers as member, _}
-				<div class="">
-					<p>{member.name}</p>
-					<p>{member.phoneNumber}</p>
-				</div>
-			{/each}
-		</div>
-		<input
-			bind:value={enteredName}
-			class="bg-gray-200 p-4"
-			type="text"
-			placeholder="name"
-		/>
-		<button
-			class="bg-blue-400 p-2 text-xs text-white"
-			onclick={checkMemberStatus}>check status</button
-		>
+<div class="w-full h-screen bg-neutral-950">
+	<div class="max-w-md mx-auto min-h-screen bg-neutral-300 p-4">
+		{@render children()}
 	</div>
 </div>
-
-{@render children()}
