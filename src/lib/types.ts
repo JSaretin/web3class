@@ -9,6 +9,9 @@ export interface User {
 
 export interface Author {
     name: string;
+    username: string;
+    dateOfBirth: string;
+    password: string;
 }
 
 export interface Comment {
