@@ -8,7 +8,7 @@
 
 	let { children }: LayoutProps = $props();
 
-	// let loggedInUser: Author | undefined = $state(undefined);
+	let loggedInUser: Author | undefined = $state(undefined);
 
 	let registeredUsers: Author[] = $state([]);
 
@@ -24,6 +24,22 @@
 
 	setContext("registerUser", registerUser);
 
+	function loginUser(username: string, password: string) {
+		for (const registerUser of registeredUsers) {
+			if (
+				registerUser.username == username &&
+				registerUser.password == password
+			) {
+				loggedInUser = registerUser;
+			}
+		}
+
+		if (loggedInUser == undefined) {
+			throw "Invalid username or password";
+		}
+	}
+
+	setContext("loginUser", loginUser);
 
 	interface User {
 		age: number;
@@ -88,9 +104,14 @@
 			>
 
 			<div class=" ">
-				<a href="/login" class="p-2 text-sm bg-blue-700">Login</a>
-				<a href="/register" class="p-2 text-sm bg-green-700">Register</a
-				>
+				{#if loggedInUser == undefined}
+					<a href="/login" class="p-2 text-sm bg-blue-700">Login</a>
+					<a href="/register" class="p-2 text-sm bg-green-700"
+						>Register</a
+					>
+				{:else}
+					<p>@{loggedInUser.username}</p>
+				{/if}
 			</div>
 		</div>
 		{@render children()}

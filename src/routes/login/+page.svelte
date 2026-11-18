@@ -3,36 +3,21 @@
     import { goto } from "$app/navigation";
     import { getContext } from "svelte";
 
-    let typedName: string = $state("");
     let typedUsername: string = $state("");
-    let typedDateOfBirth: string = $state("");
     let typedPassword: string = $state("");
-    let typedConfirmPassword: string = $state("");
 
-    const registerUser: (user: Author) => void = getContext("registerUser");
+    const loginUser: (username: string, password: string) => void =
+        getContext("loginUser");
 
-    function registerNewUser() {
-        if (typedPassword != typedConfirmPassword) {
-            alert("Password doesn't match");
-            return;
-        }
-
+    function executeLoginUser() {
         try {
-            registerUser({
-                name: typedName,
-                username: typedUsername,
-                dateOfBirth: typedDateOfBirth,
-                password: typedPassword,
-            });
+            loginUser(typedUsername, typedPassword);
 
-            typedName = "";
             typedUsername = "";
-            typedDateOfBirth = "";
             typedPassword = "";
-            typedConfirmPassword = "";
-            goto("/login");
+            goto("/");
         } catch (e) {
-            alert;
+            alert(e);
         }
     }
 </script>
@@ -57,7 +42,10 @@
             />
         </div>
 
-        <button class="w-full bg-green-600 text-white p-2">Login</button>
+        <button
+            onclick={executeLoginUser}
+            class="w-full bg-green-600 text-white p-2">Login</button
+        >
 
         <div class="mt-6">
             <small

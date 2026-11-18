@@ -32,7 +32,7 @@
             typedConfirmPassword = "";
             goto("/login");
         } catch (e) {
-            alert;
+            alert(e);
         }
     }
 </script>
