@@ -18,10 +18,10 @@
     function addNewBlog() {
         if (isNewPost) {
             // alert("new post");
-            let lastId = 0;
-            let lastPost = blogs[blogs.length - 1];
-            if (lastPost != undefined) {
-                lastId = lastPost.id;
+            let firstPostId = 0;
+            let firstPost = blogs[0];
+            if (firstPost != undefined) {
+                firstPostId = firstPost.id;
             }
 
             createBlog({
@@ -29,7 +29,9 @@
                 author: {
                     name: "John Osareting",
                 },
-                id: lastId + 1,
+                id: firstPostId + 1,
+                likes: 0,
+                comments: [],
             });
         } else {
             let tempBLogs: Blog[] = [];
@@ -72,7 +74,7 @@
     onMount(runOnLoad);
 </script>
 
-<div class="w-full gap-2">
+<div class="w-full gap-2 border-b border-neutral-500 p-4">
     <textarea
         bind:value={typedBlogPost}
         class="w-full p-2 resize-none bg-neutral-600 rounded-md outline-none border-none text-white text-sm"
@@ -83,15 +85,19 @@
             class="bg-blue-500 px-4 py-1 rounded-md text-sm">Post</button
         >
     </div>
+</div>
 
-    <div class="mt-10 flex flex-col gap-4">
-        {#each blogs as blog (blog.id)}
-            <a href={"/" + blog.id}>
-                <div class="bg-neutral-600 p-4 text-sm text-white rounded-md">
-                    <h2 class="text-2xl">{blog.id}</h2>
-                    <p>{blog.description}</p>
+<div class="flex flex-col gap-4">
+    {#each blogs as blog (blog.id)}
+        <a href={"/" + blog.id}>
+            <div class="border-b border-neutral-500 p-4 text-sm text-white">
+                <!-- <h2 class="text-2xl">{blog.id}</h2> -->
+                <p>{blog.description}</p>
+                <div class="mt-4 flex gap-4">
+                    <div class="">{blog.likes} ❤️</div>
+                    <div class="">{blog.comments.length} 🫂</div>
                 </div>
-            </a>
-        {/each}
-    </div>
+            </div>
+        </a>
+    {/each}
 </div>

@@ -16,6 +16,8 @@
 					name: "John Osaretin",
 				},
 				id: 1,
+				likes: 0,
+				comments: [],
 			},
 		];
 	}
@@ -25,7 +27,7 @@
 	setContext("getBlogs", () => blogs);
 
 	function createBlog(blog: Blog) {
-		blogs.push(blog);
+		blogs = [blog, ...blogs];
 	}
 
 	function deleteBlog(blogId: number) {
@@ -44,6 +46,19 @@
 		blogs = newBlogs;
 	}
 
+	function replacePost(newBlog: Blog) {
+		let tempBLogs: Blog[] = [];
+
+		for (const blog of blogs) {
+			if (blog.id == newBlog.id) {
+				tempBLogs.push(newBlog);
+			} else {
+				tempBLogs.push(blog);
+			}
+		}
+	}
+
+	setContext("replacePost", replacePost);
 	setContext("createBlog", createBlog);
 	setContext("deleteBlog", deleteBlog);
 	setContext("setFullListOfBlog", setFullListOfBlog);
@@ -54,7 +69,12 @@
 </svelte:head>
 
 <div class="w-full h-screen bg-neutral-950">
-	<div class="max-w-md mx-auto min-h-screen bg-neutral-300 p-4">
+	<div class="max-w-sm border-neutral-500 mx-auto min-h-screen border-x">
+		<div class="w-full flex justify-center bg-gray-300">
+			<a href="/"
+				><h1 class="text-xl font-mono text-neutral-900">X-Tweet</h1></a
+			>
+		</div>
 		{@render children()}
 	</div>
 </div>

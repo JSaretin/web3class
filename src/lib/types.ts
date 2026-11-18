@@ -11,8 +11,18 @@ export interface Author {
     name: string;
 }
 
+export interface Comment {
+    id: number;
+    description: string;
+    author: Author;
+}
+
+
 export interface Blog {
     id: number;
     description: string;
     author: Author;
+    likes: number;
+
+    comments: Comment[]
 }
