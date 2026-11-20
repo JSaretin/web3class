@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Blog } from "#lib/types.ts";
+    import type { Author, Blog } from "#lib/types.ts";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { getContext, onMount } from "svelte";
+    import { getContext, onMount, setContext } from "svelte";
 
     let getBlogs: () => Blog[] = getContext("getBlogs");
 
@@ -12,10 +12,18 @@
     const setFullListOfBlog: (newBlogs: Blog[]) => void =
         getContext("setFullListOfBlog");
 
+    let getLoggedInUser: () => Author | undefined =
+        getContext("getLoggedInUser");
+
+    let loggedInUser = $derived(getLoggedInUser());
+
     let typedBlogPost: string = $state("");
     let isNewPost = $state(true);
 
     function addNewBlog() {
+        if (loggedInUser == undefined) {
+            throw "You need to login to create post";
+        }
         if (isNewPost) {
             // alert("new post");
             let firstPostId = 0;
@@ -26,11 +34,9 @@
 
             createBlog({
                 description: typedBlogPost,
-                author: {
-                    name: "John Osareting",
-                },
+                author: loggedInUser,
                 id: firstPostId + 1,
-                likes: 0,
+                likes: [],
                 comments: [],
             });
         } else {
@@ -41,6 +47,9 @@
 
             for (const blog of blogs) {
                 if (blog.id == blogId) {
+                    if (blog.author.username != loggedInUser?.username) {
+                        throw "You are not the owner of the post";
+                    }
                     let blogCopy = { ...blog };
                     blogCopy.description = typedBlogPost;
                     tempBLogs.push(blogCopy);
@@ -94,9 +103,10 @@
                 <!-- <h2 class="text-2xl">{blog.id}</h2> -->
                 <p>{blog.description}</p>
                 <div class="mt-4 flex gap-4">
-                    <div class="">{blog.likes} ❤️</div>
+                    <div class="">{blog.likes.length} ❤️</div>
                     <div class="">{blog.comments.length} 🫂</div>
                 </div>
+                <div class="">@{blog.author.username}</div>
             </div>
         </a>
     {/each}

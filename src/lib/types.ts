@@ -25,7 +25,7 @@ export interface Blog {
     id: number;
     description: string;
     author: Author;
-    likes: number;
+    likes: Author[];
 
     comments: Comment[]
 }

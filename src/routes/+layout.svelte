@@ -10,7 +10,22 @@
 
 	let loggedInUser: Author | undefined = $state(undefined);
 
-	let registeredUsers: Author[] = $state([]);
+	setContext("getLoggedInUser", () => loggedInUser);
+
+	let registeredUsers: Author[] = $state([
+		{
+			name: "John Osaretin",
+			username: "Jsaretin",
+			password: "123456789",
+			dateOfBirth: "",
+		},
+		{
+			name: "Precious",
+			username: "Precious",
+			password: "123456789",
+			dateOfBirth: "",
+		},
+	]);
 
 	function registerUser(newUser: Author) {
 		for (const registerUser of registeredUsers) {
@@ -90,6 +105,17 @@
 	setContext("createBlog", createBlog);
 	setContext("deleteBlog", deleteBlog);
 	setContext("setFullListOfBlog", setFullListOfBlog);
+
+	function logUserOut() {
+		loggedInUser = undefined;
+	}
+
+	let globalDate = "2026-11-20";
+
+	function getGlobalDate() {
+		return globalDate;
+	}
+	setContext("getGlobalDate", getGlobalDate);
 </script>
 
 <svelte:head>
@@ -97,7 +123,7 @@
 </svelte:head>
 
 <div class="w-full h-screen bg-neutral-950 overflow-y-scroll">
-	<div class="max-w-sm border-neutral-500 mx-auto min-h-screen border-x">
+	<div class="max-w-md border-neutral-500 mx-auto min-h-screen border-x">
 		<div class="w-full px-4 py-2 flex justify-between bg-gray-300">
 			<a href="/"
 				><h1 class="text-xl font-mono text-neutral-900">X-Tweet</h1></a
@@ -110,7 +136,15 @@
 						>Register</a
 					>
 				{:else}
-					<p>@{loggedInUser.username}</p>
+					<div class="flex">
+						<a href="/profile" class="p-2 text-sm bg-green-700"
+							>@{loggedInUser.username}</a
+						>
+						<button
+							onclick={logUserOut}
+							class="p-2 text-sm bg-red-700">Logout</button
+						>
+					</div>
 				{/if}
 			</div>
 		</div>
